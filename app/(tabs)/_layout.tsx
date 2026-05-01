@@ -1,41 +1,72 @@
+import { tabs } from "@/assets/constants/data";
+// import {} from "@assets/constants/icons";
+
+import { colors, components } from "@/assets/constants/theme";
+import Clsx from "clsx";
 import { Tabs } from "expo-router";
-import React from "react";
+import { Image, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+// import {icons} from "@assets/icons"
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const tabBar = components.tabBar;
+
+const TabIcon = ({ focused, icon }: TabIconProps) => {
+  return (
+    <View className="tabs-icon">
+      <View className={Clsx("tabs-pill", focused && "tabs-active")}>
+        <Image source={icon} resizeMode="contain" className="tabs-glyph" />
+      </View>
+    </View>
+  );
+};
+
+const TabLayout = () => {
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        headerTitleAlign: "center",
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          bottom: Math.max(insets.bottom, tabBar.horizontalInset),
+          height: tabBar.height,
+          marginHorizontal: tabBar.horizontalInset,
+          borderRadius: tabBar.radius,
+          backgroundColor: colors.primary,
+          borderTopWidth: 0,
+          elevation: 0,
+        },
+        tabBarItemStyle: {
+          paddingVertical: tabBar.height / 2 - tabBar.iconFrame / 1.6,
+        },
+        tabBarIconStyle: {
+          width: tabBar.iconFrame,
+          height: tabBar.iconFrame,
+          alignItems: "center",
+        },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
-        }}
-      />
+      {/* <Tabs.Screen name="index" options={{ title: "Home" }} />
+    <Tabs.Screen name="subscription" options={{ title: "Subscription" }} />
+    <Tabs.Screen name="insights" options={{ title: "Insights" }} />
+    <Tabs.Screen name="settings" options={{ title: "Settings" }} />
+    <Tabs.Screen name="subscriptions/[id]" options={{ href: null }} /> */}
+      {tabs.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon focused={focused} icon={tab.icon} />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
-}
+};
+export default TabLayout;
